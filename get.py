@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+import matplotlib.pyplot as plt
 
 
 class GetPopularity:
@@ -15,30 +16,22 @@ class GetPopularity:
         driver = webdriver.Chrome(options=option)
         # 暗黙的待機
         driver.implicitly_wait(10)
-        driver.get('https://www.google.com/')
-
-        # indeedをクロームで検索
-        search_box = driver.find_element_by_name("q")
-        search_box.send_keys("indeed")
-        search_box.submit()
-
-        # indeedのサイトにアクセス
-        driver.find_element_by_css_selector('h3.LC20lb.DKV0Md').click()
+        driver.get('https://jp.indeed.com/')
 
         # 勤務地を入力
         work_place_box = driver.find_element_by_name("l")
         work_place_box.send_keys("東京都")
 
-        # 検索したい言語dictを作成
-        languages = {"Java": 0, "C": 0, "Ruby": 0, "Python": 0, "JavaScript": 0,
-                     "TypeScript": 0, "Go": 0, "Vue": 0, "React": 0, "AWS": 0}
+        # 検索したい言語リストを作成
+        targets = {"C": 0, "Java": 0, "Ruby": 0, "Python": 0, "JavaScript": 0,
+                   "Go": 0, "Vue": 0, "React": 0, "TypeScript": 0, "AWS": 0, }
 
         # 各言語の検索数を順番に取得
-        for i, language in enumerate(languages):
+        for i, target in enumerate(targets):
 
             # 言語を入力
             key_word_box = driver.find_element_by_name("q")
-            key_word_box.send_keys(language)
+            key_word_box.send_keys(target)
 
             # 検索ボタンをクリック
             if i == 0:
@@ -54,7 +47,7 @@ class GetPopularity:
 
             # 求人件数から数字部分のみを取得
             result = self.__char(search_text)
-            languages[language] = int(result.replace(',', ''))
+            targets[target] = int(result.replace(',', ''))
 
             # ページ遷移後のキーワード入力欄を取得
             after_key_word_box = driver.find_element_by_name("q")
@@ -62,8 +55,18 @@ class GetPopularity:
 
         driver.quit()
 
-        for key, val in languages.items():
-            print(f"'{key}'の求人件数は'{val}'件です。")
+        # valueの昇順で並び替え
+        sorted_targets = sorted(targets.items(), key=lambda x: x[1])
+
+        target_keys = []
+        target_vals = []
+
+        for target in sorted_targets:
+            target_keys.append(target[0])
+            target_vals.append(target[1])
+
+        # 求人件数順のグラフを作成
+        self.__make_glaph(target_keys, target_vals)
 
     """
     求人件数から数字部分のみ取得する。
@@ -84,3 +87,15 @@ class GetPopularity:
                 result_text += char
 
         return result_text
+
+    """
+    求人件数順のグラフを作成する
+    """
+
+    def __make_graph(self, target_keys, target_vals):
+
+        plt.bar(target_keys, target_vals)
+        plt.title("ranking of programing languages 2020")
+        plt.xlabel("programing languages")
+        plt.ylabel("the number of jobs available")
+        plt.show()
