@@ -66,7 +66,7 @@ class GetPopularity:
             target_vals.append(target[1])
 
         # 求人件数順のグラフを作成
-        self.__make_glaph(target_keys, target_vals)
+        self.__make_graph(target_keys, target_vals)
 
     """
     求人件数から数字部分のみ取得する。
