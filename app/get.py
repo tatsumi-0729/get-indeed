@@ -11,9 +11,12 @@ class GetPopularity:
 
     def get(self):
 
-        option = webdriver.ChromeOptions()
-        option.add_argument('--headless')
-        driver = webdriver.Chrome(options=option)
+        # docker内で起動するためのoptionを作成
+        options = webdriver.ChromeOptions()
+        options.add_argument('--headless')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        driver = webdriver.Chrome(options=options)
         # 暗黙的待機
         driver.implicitly_wait(10)
         driver.get('https://jp.indeed.com/')
